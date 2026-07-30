@@ -1,4 +1,5 @@
 import { Button } from "../../components/ui/button"
+import BoardColumn from "./components/BoardColumn"
 import { ArrowLeft, Pencil, Check, X } from "lucide-react"
 import { useState } from "react"
 import { Link } from "react-router-dom"
@@ -6,28 +7,38 @@ import { Input } from "@/components/ui/input"
 
 export default function BoardDetail() {
   const [isEditName, setIsEditName] = useState(false)
-  const [boardName, setBoardName] = useState("Name des Boards")
+  const [boardName, setBoardName] = useState(() => {
+    return localStorage.getItem("boardName") || "Name des Boards"
+  })
+  const [tempBoardName, setTempBoardName] = useState(boardName)
 
   function RenderBoardDetail() {
     if (isEditName) {
       return (
         <div className="flex flex-row items-center gap-2">
           <Input
-            value={boardName}
+            value={tempBoardName}
             className="w-96"
-            onChange={(e) => setBoardName(e.target.value)}
+            onChange={(e) => setTempBoardName(e.target.value)}
           />
           <Button
             variant="ghost"
             size="icon-lg"
-            onClick={() => setIsEditName(false)}
+            onClick={() => {
+              setBoardName(tempBoardName)
+              localStorage.setItem("boardName", tempBoardName)
+              setIsEditName(false)
+            }}
           >
             <Check />
           </Button>
           <Button
             variant="ghost"
             size="icon-lg"
-            onClick={() => setIsEditName(false)}
+            onClick={() => {
+              setTempBoardName(boardName)
+              setIsEditName(false)
+            }}
           >
             <X />
           </Button>
@@ -57,6 +68,11 @@ export default function BoardDetail() {
           </Button>
         </Link>
         {RenderBoardDetail()}
+      </div>
+      <div className="mt-6 grid grid-cols-3 gap-4">
+        <BoardColumn tittle="To Do" />
+        <BoardColumn tittle="In Progress" />
+        <BoardColumn tittle="Done" />
       </div>
     </div>
   )
