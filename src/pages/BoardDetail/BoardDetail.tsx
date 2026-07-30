@@ -1,16 +1,31 @@
 import { Button } from "../../components/ui/button"
+import type { Board } from "../../types/bord.types"
 import BoardColumn from "./components/BoardColumn"
 import { ArrowLeft, Pencil, Check, X } from "lucide-react"
 import { useState } from "react"
-import { Link } from "react-router-dom"
-import { Input } from "@/components/ui/input"
+import { Link, useParams } from "react-router-dom"
+import { Input } from "../../components/ui/input"
 
 export default function BoardDetail() {
+  const { id } = useParams<{ id: string }>()
   const [isEditName, setIsEditName] = useState(false)
   const [boardName, setBoardName] = useState(() => {
     return localStorage.getItem("boardName") || "Name des Boards"
   })
   const [tempBoardName, setTempBoardName] = useState(boardName)
+
+  const [board, setBoard] = useState<Board>({
+    id: "1",
+    title: "Test",
+    tasks: [
+      {
+        id: "1",
+        title: "Abc",
+        column: "Progress",
+        description: "Beschreibung",
+      },
+    ],
+  })
 
   function RenderBoardDetail() {
     if (isEditName) {
@@ -70,9 +85,18 @@ export default function BoardDetail() {
         {RenderBoardDetail()}
       </div>
       <div className="mt-6 grid grid-cols-3 gap-4">
-        <BoardColumn tittle="To Do" />
-        <BoardColumn tittle="In Progress" />
-        <BoardColumn tittle="Done" />
+        <BoardColumn
+          title="ToDo"
+          tasks={board.tasks.filter((task) => task.column === "ToDo")}
+        />
+        <BoardColumn
+          title="Progress"
+          tasks={board.tasks.filter((task) => task.column === "Progress")}
+        />
+        <BoardColumn
+          title="Done"
+          tasks={board.tasks.filter((task) => task.column === "Done")}
+        />
       </div>
     </div>
   )
