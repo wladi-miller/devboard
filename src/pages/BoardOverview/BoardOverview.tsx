@@ -9,7 +9,7 @@ export default function BoardOverview() {
       id: "1",
       title: "Test",
       tasks: [
-        { id: "1", title: "Abc", column: "Todo", description: "Beschreibung" },
+        { id: "1", title: "Abc", column: "ToDo", description: "Beschreibung" },
       ],
     },
   ])

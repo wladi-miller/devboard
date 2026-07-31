@@ -1,6 +1,6 @@
 // import { Button } from "@/components/ui/button"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import Profile from "./pages/Profile/profile"
+import Profile from "./pages/Profile/Profile"
 import BoardDetail from "./pages/BoardDetail/BoardDetail"
 import BoardOverview from "./pages/BoardOverview/BoardOverview"
 
