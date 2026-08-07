@@ -38,7 +38,7 @@ export default function BoardDetail() {
           />
           <Button
             variant="ghost"
-            size="icon-lg"
+            size="icon-xl"
             onClick={() => {
               setBoardName(tempBoardName)
               localStorage.setItem("boardName", tempBoardName)
@@ -49,7 +49,7 @@ export default function BoardDetail() {
           </Button>
           <Button
             variant="ghost"
-            size="icon-lg"
+            size="icon-xl"
             onClick={() => {
               setTempBoardName(boardName)
               setIsEditName(false)
@@ -68,7 +68,7 @@ export default function BoardDetail() {
             size="icon-lg"
             onClick={() => setIsEditName(true)}
           >
-            <Pencil className="h-5 w-5" />
+            <Pencil className="size-4" />
           </Button>
         </div>
       )
@@ -79,7 +79,7 @@ export default function BoardDetail() {
       <div className="flex flex-row items-center gap-2">
         <Link to="/boards">
           <Button variant="ghost" size="icon-lg">
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="size-5" />
           </Button>
         </Link>
         {RenderBoardDetail()}

@@ -7,17 +7,17 @@ export default function Header() {
       <div className="container mx-auto flex justify-between">
         <Link
           to="/boards"
-          className="flex flex-row items-center gap-2 text-lg text-white"
+          className="flex flex-row items-center gap-2 text-lg text-primary"
         >
           <LayoutDashboard className="h-5 w-5" />
           DevBoard
         </Link>
         <Link
           to="/profile"
-          className="flex flex-row items-center gap-2 text-lg text-white"
+          className="flex flex-row items-center gap-2 text-lg text-secondary hover:text-primary"
         >
           <CircleUser className="h-5 w-5" />
-          Profil
+          <span className="text-secondary">Profil</span>
         </Link>
       </div>
     </header>

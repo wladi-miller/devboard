@@ -12,7 +12,13 @@ import type { Task } from "../../../types/bord.types"
 
 export default function TaskCard({ task }: { task: Task }) {
   return (
-    <Card>
+    <Card
+      size="sm"
+      draggable={true}
+      onDragStart={(e) => {
+        e.dataTransfer.setData("column", task.column)
+      }}
+    >
       <CardHeader>
         <CardTitle>{task.title}</CardTitle>
         <CardDescription>{task.description}</CardDescription>

@@ -14,7 +14,7 @@ import type { Board } from "../../../types/bord.types"
 export default function BoardCard({ board }: { board: Board }) {
   return (
     <Link to={`/boards/${board.id}`}>
-      <Card className="border-2 border-black transition-shadow hover:shadow-md">
+      <Card className="transition-shadow hover:shadow-md">
         <CardHeader>
           <CardTitle className="hover:underline">{board.title}</CardTitle>
           <CardDescription>
