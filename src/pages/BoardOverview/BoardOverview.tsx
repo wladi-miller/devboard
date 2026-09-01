@@ -27,6 +27,20 @@ export default function BoardOverview() {
 
   const [boardNameInput, setBoardNameInput] = useState("Neues Board")
 
+  const handleCreateBoard = () => {
+    const trimmedTitle = boardNameInput.trim() || "Neues Board"
+
+    setBoards((currentBoards) => [
+      ...currentBoards,
+      {
+        id: crypto.randomUUID(),
+        title: trimmedTitle,
+        tasks: [],
+      },
+    ])
+    setBoardNameInput("Neues Board")
+  }
+
   return (
     <>
       <div className="flex flex-row place-content-between">
@@ -58,7 +72,9 @@ export default function BoardOverview() {
                 <Button variant="outline">Abbrechen</Button>
               </DialogClose>
               <DialogClose asChild>
-                <Button type="submit">Speichern</Button>
+                <Button type="button" onClick={handleCreateBoard}>
+                  Speichern
+                </Button>
               </DialogClose>
             </DialogFooter>
           </DialogContent>
