@@ -31,14 +31,13 @@ export default function BoardColumn({
     if (isTaskInTasks(column)) {
       setIsDragHover(false)
     } else {
-      //Call Function to move the task to this column
-      setIsDragHover(false)
+      //CALL MOVE
     }
   }
 
   return (
     <div
-      className={`rounded-lg border border-black bg-gray-50 ${isDragHover ? "border-1 border-primary" : ""}`}
+      className={`rounded-lg border border-black bg-gray-50 ${isDragHover ? "border border-primary" : ""}`}
       onDragEnter={handleDragHover}
       onDragOver={handleDragHover}
       onDragLeave={() => setIsDragHover(false)}
