@@ -1,49 +1,50 @@
 import { Button } from "../../components/ui/button"
-import type { Board } from "../../types/bord.types"
+import { useReducer } from "react"
+import { useBoardDetailReducer } from "@/hooks/boardsDetailReducer"
 import BoardColumn from "./components/BoardColumn"
 import { ArrowLeft, Pencil, Check, X } from "lucide-react"
 import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { Input } from "../../components/ui/input"
+import { getBoardById } from "@/lib/api"
 
 export default function BoardDetail() {
   const { id } = useParams<{ id: string }>()
   const [isEditName, setIsEditName] = useState(false)
-  const [boardName, setBoardName] = useState(() => {
-    return localStorage.getItem("boardName") || "Name des Boards"
-  })
-  const [tempBoardName, setTempBoardName] = useState(boardName)
+  const [boardName, setBoardName] = useState("Name des Boards")
+  const boardFromStorage = getBoardById(id ?? "") ?? {
+    id: "",
+    title: "",
+    tasks: [],
+  }
+  const [board, dispatchBoard] = useReducer(
+    useBoardDetailReducer,
+    boardFromStorage
+  )
 
-  const [board, setBoard] = useState<Board>({
-    id: "1",
-    title: "Test",
-    tasks: [
-      {
-        id: "1",
-        title: "Abc",
-        column: "Progress",
-        description: "Beschreibung",
-      },
-    ],
-  })
+  function handleEditBoardTitle() {
+    setIsEditName(true)
+    setBoardName(board.title)
+  }
+
+  function handleSubmitBoardTitle() {
+    dispatchBoard({ type: "UPDATE_BOARD_NAME", data: boardName })
+    setIsEditName(false)
+  }
 
   function RenderBoardDetail() {
     if (isEditName) {
       return (
         <div className="flex flex-row items-center gap-2">
           <Input
-            value={tempBoardName}
+            value={boardName}
             className="w-96"
-            onChange={(e) => setTempBoardName(e.target.value)}
+            onChange={(e) => setBoardName(e.target.value)}
           />
           <Button
             variant="ghost"
             size="icon-xl"
-            onClick={() => {
-              setBoardName(tempBoardName)
-              localStorage.setItem("boardName", tempBoardName)
-              setIsEditName(false)
-            }}
+            onClick={handleSubmitBoardTitle}
           >
             <Check />
           </Button>
@@ -51,7 +52,6 @@ export default function BoardDetail() {
             variant="ghost"
             size="icon-xl"
             onClick={() => {
-              setTempBoardName(boardName)
               setIsEditName(false)
             }}
           >
@@ -62,12 +62,8 @@ export default function BoardDetail() {
     } else {
       return (
         <div className="flex flex-row items-center gap-2">
-          <h1 className="text-2xl font-bold">{boardName}</h1>
-          <Button
-            variant="ghost"
-            size="icon-lg"
-            onClick={() => setIsEditName(true)}
-          >
+          <h1 className="text-2xl font-bold">{board.title}</h1>
+          <Button variant="ghost" size="icon-lg" onClick={handleEditBoardTitle}>
             <Pencil className="size-4" />
           </Button>
         </div>
