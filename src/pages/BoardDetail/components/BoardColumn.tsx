@@ -18,22 +18,31 @@ export default function BoardColumn({
   }
 
   function handleDragHover(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+
     const column = event.dataTransfer.getData("column")
+
     if (isTaskInTasks(column)) {
       setIsDragHover(false)
-    } else {
-      setIsDragHover(true)
+      return
     }
+
+    setIsDragHover(true)
   }
 
   function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+
     const column = event.dataTransfer.getData("column")
     if (isTaskInTasks(column)) {
       setIsDragHover(false)
     } else {
-      //CALL MOVE
+      setIsDragHover(false)
+      // CALL MOVE
     }
   }
+
+  const showDropHint = isDragHover && tasks.length === 0
 
   return (
     <div
@@ -51,11 +60,11 @@ export default function BoardColumn({
         </Button>
       </div>
       <div className="p-4">
-        <div
-          className={`rounded-xl border-2 border-dashed border-primary bg-primary/10 p-2 text-center text-primary ${!isDragHover && "hidden"}`}
-        >
-          Hier ablegen
-        </div>
+        {showDropHint && (
+          <div className="rounded-xl border-2 border-dashed border-primary bg-primary/10 p-2 text-center text-primary">
+            Hier ablegen
+          </div>
+        )}
         {tasks.map((task) => (
           <TaskCard key={task.id} task={task} />
         ))}

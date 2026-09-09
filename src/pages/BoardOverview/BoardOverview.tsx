@@ -12,46 +12,60 @@ import {
 } from "../../components/ui/dialog"
 import BoardCard from "./components/BoardCard"
 import { useState } from "react"
+import { useReducer } from "react"
+import { userBoardsOverviewReducer } from "../../hooks/boardsOverwievReducer"
 import type { Board } from "../../types/bord.types"
+import { getBoards } from "../../lib/api"
 
 export default function BoardOverview() {
-  const [boards, setBoards] = useState<Board[]>([
-    {
-      id: "1",
-      title: "Test",
-      tasks: [
-        { id: "1", title: "Abc", column: "ToDo", description: "Beschreibung" },
-      ],
-    },
-  ])
+  const [boards, boardsDispatch] = useReducer(
+    userBoardsOverviewReducer,
+    getBoards()
+  )
 
   const [boardNameInput, setBoardNameInput] = useState("Neues Board")
 
-  const handleCreateBoard = () => {
-    const trimmedTitle = boardNameInput.trim() || "Neues Board"
-
-    setBoards((currentBoards) => [
-      ...currentBoards,
-      {
-        id: crypto.randomUUID(),
-        title: trimmedTitle,
-        tasks: [],
-      },
-    ])
+  const resetBoardNameInput = () => {
     setBoardNameInput("Neues Board")
+  }
+
+  function handleAddNewBoard() {
+    const newBoard: Board = {
+      id: String(Math.random()),
+      title: boardNameInput.trim() || "Neues Board",
+      tasks: [],
+    }
+
+    boardsDispatch({ type: "ADD", data: newBoard })
+    resetBoardNameInput()
+  }
+
+  function handleDeleteBoard(id: string) {
+    boardsDispatch({
+      type: "DELETE",
+      data: { id: id, title: "", tasks: [] },
+    })
   }
 
   return (
     <>
       <div className="flex flex-row place-content-between">
         <h1 className="text-xl font-bold">Meine Boards</h1>
-        <Dialog>
-          <DialogTrigger>
+
+        <Dialog
+          onOpenChange={(open) => {
+            if (open) {
+              resetBoardNameInput()
+            }
+          }}
+        >
+          <DialogTrigger asChild>
             <Button>
               <Plus className="size-4" />
               Neues Board
             </Button>
           </DialogTrigger>
+
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Neues Board erstellen</DialogTitle>
@@ -60,30 +74,34 @@ export default function BoardOverview() {
                 angelegt (ToDo, In Progress, Done).
               </DialogDescription>
             </DialogHeader>
+
             <Input
-              onChange={(e) => setBoardNameInput(e.target.value)}
-              id="name-1"
-              name="name"
               value={boardNameInput}
-              defaultValue="Neues Board"
+              onChange={(e) => setBoardNameInput(e.target.value)}
+              placeholder="Neues Board"
             />
+
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Abbrechen</Button>
               </DialogClose>
+
               <DialogClose asChild>
-                <Button type="button" onClick={handleCreateBoard}>
-                  Speichern
-                </Button>
+                <Button onClick={handleAddNewBoard}>Speichern</Button>
               </DialogClose>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
+
       <div className="grid grid-cols-3 gap-4 pt-4">
-        {boards.map((board) => {
-          return <BoardCard key={board.id} board={board} />
-        })}
+        {boards.map((board) => (
+          <BoardCard
+            key={board.id}
+            board={board}
+            onDelete={handleDeleteBoard}
+          />
+        ))}
       </div>
     </>
   )
