@@ -10,4 +10,5 @@ export interface Task {
   column: "ToDo" | "Progress" | "Done"
   description?: string
   deadline?: string
+  assignee?: string
 }

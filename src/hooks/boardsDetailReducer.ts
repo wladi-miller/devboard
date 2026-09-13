@@ -7,7 +7,7 @@ type BoardsDetailAction =
       data: string
     }
   | {
-      type: "ADD_TASK" | "DELETE_TASK"
+      type: "ADD_TASK" | "DELETE_TASK" | "UPDATE_TASK"
       data: Task
     }
 
@@ -16,6 +16,7 @@ export function useBoardDetailReducer(
   action: BoardsDetailAction
 ) {
   let newState = prevState
+
   switch (action.type) {
     case "UPDATE_BOARD_NAME": {
       newState = {
@@ -24,6 +25,7 @@ export function useBoardDetailReducer(
       }
       break
     }
+
     case "ADD_TASK": {
       newState = {
         ...prevState,
@@ -31,6 +33,7 @@ export function useBoardDetailReducer(
       }
       break
     }
+
     case "DELETE_TASK": {
       newState = {
         ...prevState,
@@ -38,7 +41,18 @@ export function useBoardDetailReducer(
       }
       break
     }
+
+    case "UPDATE_TASK": {
+      newState = {
+        ...prevState,
+        tasks: prevState.tasks.map((task) =>
+          task.id === action.data.id ? action.data : task
+        ),
+      }
+      break
+    }
   }
+
   saveBoard(newState)
   return newState
 }

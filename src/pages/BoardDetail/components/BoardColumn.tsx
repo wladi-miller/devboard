@@ -37,16 +37,19 @@ export default function BoardColumn({
   title,
   tasks,
   onAddTask,
+  onDeleteTask,
+  handleEditTask,
 }: {
   title: "ToDo" | "Progress" | "Done"
   tasks: Task[]
   onAddTask: (task: Task) => void
+  onDeleteTask: (task: Task) => void
+  handleEditTask: (task: Task) => void
 }) {
   const [isDragHover, setIsDragHover] = useState(false)
   const [taskTitle, setTaskTitle] = useState<string>("")
   const [taskDiscription, setTaskDiscription] = useState<string>("")
   const [selectedPerson, setSelectedPerson] = useState<string>()
-
   const [date, setDate] = useState<Date>()
 
   function isTaskInTasks(column: string): boolean {
@@ -86,7 +89,8 @@ export default function BoardColumn({
       title: taskTitle,
       description: taskDiscription ?? "",
       column: title,
-      deadline: date?.toISOString() ?? "",
+      deadline: date?.toISOString(),
+      assignee: selectedPerson,
     }
     onAddTask(newTask)
     setTaskTitle("")
@@ -191,7 +195,12 @@ export default function BoardColumn({
           </div>
         )}
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard
+            key={task.id}
+            task={task}
+            onDeleteTask={onDeleteTask}
+            handleEditTask={handleEditTask}
+          />
         ))}
       </div>
     </div>
