@@ -25,7 +25,6 @@ import {
   SelectItem,
 } from "../../../components/ui/select"
 import { Button } from "../../../components/ui/button"
-
 import { Input } from "../../../components/ui/input"
 import { Textarea } from "../../../components/ui/textarea"
 import type { Task } from "@/types/bord.types"
@@ -57,6 +56,7 @@ export default function TaskDialog({
   const [date, setDate] = useState<Date | undefined>(
     parseDeadline(task.deadline)
   )
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
   function handleSave() {
     handleSubmitUpdate({
@@ -64,7 +64,7 @@ export default function TaskDialog({
       title: taskTitle,
       description: taskDiscription,
       deadline: date?.toISOString(),
-      assignee: selectedPerson,
+      assignee: selectedPerson || undefined,
       column: task.column,
     })
   }
@@ -78,6 +78,7 @@ export default function TaskDialog({
             Bearbeite die Details dieser Aufgabe.
           </DialogDescription>
         </DialogHeader>
+
         <div>
           <span>Titel</span>
           <Input
@@ -85,6 +86,7 @@ export default function TaskDialog({
             onChange={(e) => setTaskTitle(e.target.value)}
           />
         </div>
+
         <div>
           <span>Beschreibung</span>
           <Textarea
@@ -92,6 +94,7 @@ export default function TaskDialog({
             onChange={(e) => setTaskDiscription(e.target.value)}
           />
         </div>
+
         <div>
           <span>Zugewiesen an</span>
           <Select value={selectedPerson} onValueChange={setSelectedPerson}>
@@ -105,9 +108,10 @@ export default function TaskDialog({
             </SelectContent>
           </Select>
         </div>
+
         <div className="flex flex-col">
           <span>Deadline</span>
-          <Popover>
+          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -126,17 +130,20 @@ export default function TaskDialog({
               <Calendar
                 mode="single"
                 selected={date}
-                onSelect={setDate}
+                onSelect={(selectedDate) => {
+                  setDate(selectedDate)
+                  if (selectedDate) setIsCalendarOpen(false)
+                }}
                 defaultMonth={date ?? new Date()}
               />
             </PopoverContent>
           </Popover>
         </div>
+
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Abbrechen</Button>
           </DialogClose>
-
           <Button onClick={handleSave}>Speichern</Button>
         </DialogFooter>
       </DialogContent>

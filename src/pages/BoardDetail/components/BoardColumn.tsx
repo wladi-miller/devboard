@@ -49,8 +49,9 @@ export default function BoardColumn({
   const [isDragHover, setIsDragHover] = useState(false)
   const [taskTitle, setTaskTitle] = useState<string>("")
   const [taskDiscription, setTaskDiscription] = useState<string>("")
-  const [selectedPerson, setSelectedPerson] = useState<string>()
+  const [selectedPerson, setSelectedPerson] = useState<string>("")
   const [date, setDate] = useState<Date>()
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
   function isTaskInTasks(column: string): boolean {
     return column === title
@@ -90,18 +91,23 @@ export default function BoardColumn({
       description: taskDiscription ?? "",
       column: title,
       deadline: date?.toISOString(),
-      assignee: selectedPerson,
+      assignee: selectedPerson || undefined,
     }
+
     onAddTask(newTask)
     setTaskTitle("")
     setTaskDiscription("")
     setSelectedPerson("")
     setDate(undefined)
+    setIsCalendarOpen(false)
   }
 
   return (
     <div
-      className={`rounded-lg border border-black bg-gray-50 ${isDragHover ? "border border-primary" : ""}`}
+      className={
+        "rounded-lg border border-black bg-gray-50 " +
+        (isDragHover ? "border border-primary" : "")
+      }
       onDragEnter={handleDragHover}
       onDragOver={handleDragHover}
       onDragLeave={() => setIsDragHover(false)}
@@ -126,6 +132,7 @@ export default function BoardColumn({
                 Erstelle eine neue Aufgabe für diese Spalte.
               </DialogDescription>
             </DialogHeader>
+
             <div>
               <span>Titel</span>
               <Input
@@ -133,6 +140,7 @@ export default function BoardColumn({
                 onChange={(e) => setTaskTitle(e.target.value)}
               />
             </div>
+
             <div>
               <span>Beschreibung</span>
               <Textarea
@@ -140,6 +148,7 @@ export default function BoardColumn({
                 onChange={(e) => setTaskDiscription(e.target.value)}
               />
             </div>
+
             <div>
               <span>Zugewiesen an</span>
               <Select value={selectedPerson} onValueChange={setSelectedPerson}>
@@ -153,9 +162,10 @@ export default function BoardColumn({
                 </SelectContent>
               </Select>
             </div>
+
             <div className="flex flex-col">
               <span>Deadline</span>
-              <Popover>
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -170,12 +180,16 @@ export default function BoardColumn({
                   <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
-                    defaultMonth={date}
+                    onSelect={(selectedDate) => {
+                      setDate(selectedDate)
+                      if (selectedDate) setIsCalendarOpen(false)
+                    }}
+                    defaultMonth={date ?? new Date()}
                   />
                 </PopoverContent>
               </Popover>
             </div>
+
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Abbrechen</Button>
@@ -188,6 +202,7 @@ export default function BoardColumn({
           </DialogContent>
         </Dialog>
       </div>
+
       <div className="p-4">
         {showDropHint && (
           <div className="rounded-xl border-2 border-dashed border-primary bg-primary/10 p-2 text-center text-primary">
