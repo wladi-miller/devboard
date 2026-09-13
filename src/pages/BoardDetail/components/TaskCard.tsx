@@ -21,7 +21,13 @@ export default function TaskCard({ task }: { task: Task }) {
     >
       <CardHeader>
         <CardTitle>{task.title}</CardTitle>
-        <CardDescription>{task.description}</CardDescription>
+        <CardDescription>
+          {task.description}
+          {task.deadline
+            ? new Date(task.deadline).toLocaleDateString("de-DE")
+            : ""}
+        </CardDescription>
+
         <CardAction>
           <Button
             className="text-muted-foreground hover:text-destructive"

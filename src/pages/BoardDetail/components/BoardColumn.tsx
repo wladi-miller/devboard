@@ -36,13 +36,15 @@ import { Textarea } from "@/components/ui/textarea"
 export default function BoardColumn({
   title,
   tasks,
+  onAddTask,
 }: {
-  title: string
+  title: "ToDo" | "Progress" | "Done"
   tasks: Task[]
+  onAddTask: (task: Task) => void
 }) {
   const [isDragHover, setIsDragHover] = useState(false)
-  const [taskTitle, setTaskTitle] = useState<string>()
-  const [taskDiscription, setTaskDiscription] = useState<string>()
+  const [taskTitle, setTaskTitle] = useState<string>("")
+  const [taskDiscription, setTaskDiscription] = useState<string>("")
   const [selectedPerson, setSelectedPerson] = useState<string>()
 
   const [date, setDate] = useState<Date>()
@@ -78,7 +80,20 @@ export default function BoardColumn({
 
   const showDropHint = isDragHover && tasks.length === 0
 
-  function handleAddNewTask() {}
+  function handleAddNewTask() {
+    const newTask: Task = {
+      id: String(Math.random()),
+      title: taskTitle,
+      description: taskDiscription ?? "",
+      column: title,
+      deadline: date?.toISOString() ?? "",
+    }
+    onAddTask(newTask)
+    setTaskTitle("")
+    setTaskDiscription("")
+    setSelectedPerson("")
+    setDate(undefined)
+  }
 
   return (
     <div

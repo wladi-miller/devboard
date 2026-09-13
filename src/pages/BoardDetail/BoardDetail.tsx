@@ -7,6 +7,7 @@ import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { Input } from "../../components/ui/input"
 import { getBoardById } from "@/lib/api"
+import type { Task } from "@/types/bord.types"
 
 export default function BoardDetail() {
   const { id } = useParams<{ id: string }>()
@@ -21,6 +22,10 @@ export default function BoardDetail() {
     useBoardDetailReducer,
     boardFromStorage
   )
+
+  function handleAddTask(task: Task) {
+    dispatchBoard({ type: "ADD_TASK", data: task })
+  }
 
   function handleEditBoardTitle() {
     setIsEditName(true)
@@ -43,14 +48,14 @@ export default function BoardDetail() {
           />
           <Button
             variant="ghost"
-            size="icon-xl"
+            size="icon-lg"
             onClick={handleSubmitBoardTitle}
           >
             <Check />
           </Button>
           <Button
             variant="ghost"
-            size="icon-xl"
+            size="icon-lg"
             onClick={() => {
               setIsEditName(false)
             }}
@@ -84,14 +89,17 @@ export default function BoardDetail() {
         <BoardColumn
           title="ToDo"
           tasks={board.tasks.filter((task) => task.column === "ToDo")}
+          onAddTask={handleAddTask}
         />
         <BoardColumn
           title="Progress"
           tasks={board.tasks.filter((task) => task.column === "Progress")}
+          onAddTask={handleAddTask}
         />
         <BoardColumn
           title="Done"
           tasks={board.tasks.filter((task) => task.column === "Done")}
+          onAddTask={handleAddTask}
         />
       </div>
     </div>
