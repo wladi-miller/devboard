@@ -21,6 +21,7 @@ export default function TaskCard({
 }) {
   return (
     <Card
+      className="hover:cursor-pointer"
       size="sm"
       draggable={true}
       onDragStart={(e) => {

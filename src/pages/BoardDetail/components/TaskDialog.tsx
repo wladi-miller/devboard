@@ -38,12 +38,16 @@ function parseDeadline(deadline?: string): Date | undefined {
 export default function TaskDialog({
   open,
   handleOpenChange,
-  handleSubmitUpdate,
+  onSubmitUpdate,
+  title,
+  description,
   task,
 }: {
   open: boolean
   handleOpenChange: (open: boolean) => void
-  handleSubmitUpdate: (task: Task) => void
+  onSubmitUpdate: (task: Task) => void
+  title: string
+  description: string
   task: Task
 }) {
   const [taskTitle, setTaskTitle] = useState<string>(task.title)
@@ -58,25 +62,27 @@ export default function TaskDialog({
   )
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
-  function handleSave() {
-    handleSubmitUpdate({
+  function handleSubmitUpdate() {
+    const updatedTask: Task = {
       ...task,
+      id: task.id || `task-${Date.now()}-${Math.random()}`,
       title: taskTitle,
       description: taskDiscription,
       deadline: date?.toISOString(),
       assignee: selectedPerson || undefined,
       column: task.column,
-    })
+    }
+
+    onSubmitUpdate(updatedTask)
+    handleOpenChange(false)
   }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Task bearbeiten</DialogTitle>
-          <DialogDescription>
-            Bearbeite die Details dieser Aufgabe.
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         <div>
@@ -119,7 +125,7 @@ export default function TaskDialog({
                 className="w-full justify-between text-left font-normal data-[empty=true]:text-muted-foreground"
               >
                 {date && isValid(date) ? (
-                  format(date, "PPP")
+                  format(date, "dd.MM.yyyy")
                 ) : (
                   <span>Pick a date</span>
                 )}
@@ -144,7 +150,7 @@ export default function TaskDialog({
           <DialogClose asChild>
             <Button variant="outline">Abbrechen</Button>
           </DialogClose>
-          <Button onClick={handleSave}>Speichern</Button>
+          <Button onClick={handleSubmitUpdate}>Speichern</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
