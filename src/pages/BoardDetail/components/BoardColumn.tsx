@@ -13,24 +13,49 @@ export default function BoardColumn({
   onAddTask,
   onDeleteTask,
   handleEditTask,
+  onUpdateTaskStatus,
 }: {
   title: "ToDo" | "Progress" | "Done"
   tasks: Task[]
   onAddTask: (task: Task) => void
   onDeleteTask: (task: Task) => void
   handleEditTask: (task: Task) => void
+  onUpdateTaskStatus: (
+    id: string,
+    newColumn: "ToDo" | "Progress" | "Done"
+  ) => void
 }) {
   const [isDragHover, setIsDragHover] = useState(false)
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false)
 
   function isTaskInTasks(column: string): boolean {
-    return column === title
+    return column === title.toLowerCase()
+  }
+
+  function getColumnFromDraggedItem(dataTransfer: DataTransfer): string {
+    let column: string = ""
+    dataTransfer.types.forEach((type) => {
+      if (type.startsWith("column-")) {
+        column = type.replace("column-", "")
+      }
+    })
+    return column
+  }
+
+  function getIdFromDraggedItem(dataTransfer: DataTransfer): string {
+    let id: string = ""
+    dataTransfer.types.forEach((type) => {
+      if (type.startsWith("id-")) {
+        id = type.replace("id-", "")
+      }
+    })
+    return id
   }
 
   function handleDragHover(event: React.DragEvent<HTMLDivElement>) {
     event.preventDefault()
 
-    const column = event.dataTransfer.getData("column")
+    const column = getColumnFromDraggedItem(event.dataTransfer)
 
     if (isTaskInTasks(column)) {
       setIsDragHover(false)
@@ -43,10 +68,13 @@ export default function BoardColumn({
   function handleDrop(event: React.DragEvent<HTMLDivElement>) {
     event.preventDefault()
 
-    const column = event.dataTransfer.getData("column")
+    const column = getColumnFromDraggedItem(event.dataTransfer)
+    const id = getIdFromDraggedItem(event.dataTransfer) ?? "unknown-id"
+
     if (isTaskInTasks(column)) {
       setIsDragHover(false)
     } else {
+      onUpdateTaskStatus(id, title)
       setIsDragHover(false)
     }
   }
@@ -69,7 +97,12 @@ export default function BoardColumn({
       onDrop={handleDrop}
     >
       <div className="flex items-center justify-between border-b border-black p-4">
-        <h3 className="font-bold">{title}</h3>
+        <h3 className="font-bold">
+          {title}
+          {tasks.length > 0 && (
+            <span className="ml-2 text-sm font-normal"> {tasks.length}</span>
+          )}
+        </h3>
 
         <Button
           variant="ghost"
@@ -104,6 +137,11 @@ export default function BoardColumn({
           </div>
         )}
         <div className="flex flex-col gap-4">
+          {tasks.length === 0 && !showDropHint && (
+            <span className="text-center text-sm text-gray-500">
+              Keine Aufgaben in dieser Spalte
+            </span>
+          )}
           {tasks.map((task) => (
             <TaskCard
               key={task.id}

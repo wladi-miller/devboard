@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,6 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
 } from "../../../components/ui/dialog"
 import {
   Popover,
@@ -28,6 +27,7 @@ import { Button } from "../../../components/ui/button"
 import { Input } from "../../../components/ui/input"
 import { Textarea } from "../../../components/ui/textarea"
 import type { Task } from "@/types/bord.types"
+import UserNameContext from "@/context/UserNameContext"
 
 function parseDeadline(deadline?: string): Date | undefined {
   if (!deadline) return undefined
@@ -50,17 +50,38 @@ export default function TaskDialog({
   description: string
   task: Task
 }) {
+  const contex = useContext(UserNameContext)
+
   const [taskTitle, setTaskTitle] = useState<string>(task.title)
   const [taskDiscription, setTaskDiscription] = useState<string>(
-    task.description ?? ""
+    task.description ?? " "
   )
   const [selectedPerson, setSelectedPerson] = useState<string>(
-    task.assignee ?? ""
+    task.assignee ?? " "
   )
   const [date, setDate] = useState<Date | undefined>(
     parseDeadline(task.deadline)
   )
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+
+  const resetForm = () => {
+    setTaskTitle(task.title)
+    setTaskDiscription(task.description ?? " ")
+    setSelectedPerson(task.assignee ?? " ")
+    setDate(parseDeadline(task.deadline))
+    setIsCalendarOpen(false)
+  }
+
+  /*   useEffect(() => {
+    if (open) {
+      resetForm()
+    }
+  }, [open, task]) */
+
+  function handleCancel() {
+    resetForm()
+    handleOpenChange(false)
+  }
 
   function handleSubmitUpdate() {
     const updatedTask: Task = {
@@ -78,7 +99,15 @@ export default function TaskDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          resetForm()
+        }
+        handleOpenChange(nextOpen)
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -109,7 +138,10 @@ export default function TaskDialog({
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="light">Light</SelectItem>
+                <SelectItem value=" ">keine Zuweisung</SelectItem>
+                <SelectItem value={contex?.username ?? "undefined"}>
+                  {contex?.username ?? "undefined"}
+                </SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -147,10 +179,12 @@ export default function TaskDialog({
         </div>
 
         <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Abbrechen</Button>
-          </DialogClose>
-          <Button onClick={handleSubmitUpdate}>Speichern</Button>
+          <Button variant="outline" onClick={handleCancel}>
+            Abbrechen
+          </Button>
+          <Button onClick={handleSubmitUpdate} disabled={taskTitle === ""}>
+            Speichern
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

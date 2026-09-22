@@ -6,7 +6,7 @@ import {
   CardAction,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Trash2 } from "lucide-react"
+import { Trash2, CalendarIcon, CircleUser } from "lucide-react"
 
 import type { Task } from "../../../types/bord.types"
 
@@ -25,17 +25,29 @@ export default function TaskCard({
       size="sm"
       draggable={true}
       onDragStart={(e) => {
-        e.dataTransfer.setData("column", task.column)
+        e.dataTransfer.setData(`column-${task.column}`, "")
+        e.dataTransfer.setData(`id-${task.id}`, "")
       }}
       onClick={() => handleEditTask(task)}
     >
       <CardHeader>
         <CardTitle>{task.title}</CardTitle>
-        <CardDescription>
-          {task.description}
-          {task.deadline
-            ? new Date(task.deadline).toLocaleDateString("de-DE")
-            : ""}
+        <CardDescription className="flex flex-col">
+          {task.description && <span className="mb-2">{task.description}</span>}
+          {task.assignee && (
+            <span className="flex items-center gap-1">
+              {<CircleUser className="size-3" />}
+              {task.assignee}
+            </span>
+          )}
+          {task.deadline && (
+            <span className="flex items-center gap-1">
+              {<CalendarIcon className="size-3" />}
+              {new Date(task.deadline ?? new Date()).toLocaleDateString(
+                "de-DE"
+              )}
+            </span>
+          )}
         </CardDescription>
 
         <CardAction>

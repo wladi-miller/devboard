@@ -1,5 +1,6 @@
 // import { Button } from "@/components/ui/button"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import { UserNameProvider } from "./context/UserNameProvider"
 import Profile from "./pages/Profile/profile"
 import BoardDetail from "./pages/BoardDetail/BoardDetail"
 import BoardOverview from "./pages/BoardOverview/BoardOverview"
@@ -32,7 +33,11 @@ const router = createBrowserRouter([
 ])
 
 export function App() {
-  return <RouterProvider router={router}></RouterProvider>
+  return (
+    <UserNameProvider>
+      <RouterProvider router={router}></RouterProvider>
+    </UserNameProvider>
+  )
 }
 
 export default App

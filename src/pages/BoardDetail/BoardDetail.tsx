@@ -36,6 +36,13 @@ export default function BoardDetail() {
     dispatchBoard({ type: "DELETE_TASK", data: task })
   }
 
+  function handleUpdateTaskStatus(
+    id: string,
+    newColumn: "ToDo" | "Progress" | "Done"
+  ) {
+    dispatchBoard({ type: "UPDATE_TASK_STATUS", data: { id, newColumn } })
+  }
+
   function handleSubmitTaskUpdate(task: Task) {
     dispatchBoard({ type: "UPDATE_TASK", data: task })
     setIsEditTaskDialogOpen(false)
@@ -130,6 +137,7 @@ export default function BoardDetail() {
           tasks={board.tasks.filter((task) => task.column === "ToDo")}
           onAddTask={handleAddTask}
           handleEditTask={handleEditTask}
+          onUpdateTaskStatus={handleUpdateTaskStatus}
         />
         <BoardColumn
           title="Progress"
@@ -137,6 +145,7 @@ export default function BoardDetail() {
           tasks={board.tasks.filter((task) => task.column === "Progress")}
           onAddTask={handleAddTask}
           handleEditTask={handleEditTask}
+          onUpdateTaskStatus={handleUpdateTaskStatus}
         />
         <BoardColumn
           title="Done"
@@ -144,6 +153,7 @@ export default function BoardDetail() {
           tasks={board.tasks.filter((task) => task.column === "Done")}
           onAddTask={handleAddTask}
           handleEditTask={handleEditTask}
+          onUpdateTaskStatus={handleUpdateTaskStatus}
         />
       </div>
     </div>

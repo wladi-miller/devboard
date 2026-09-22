@@ -1,4 +1,5 @@
-import React from "react"
+import { useContext } from "react"
+import UserNameContext from "@/context/UserNameContext"
 import {
   Card,
   CardContent,
@@ -11,10 +12,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export default function Profile() {
-  const [username, setUsername] = React.useState("Liam2")
+  //const [username, setUsername] = React.useState("Liam2")
+  const context = useContext(UserNameContext)
+
+  if (!context) {
+    return null
+  }
+
+  const { username, setUsername } = context
 
   function handleSave() {
     localStorage.setItem("username", username)
+    setUsername(username)
   }
 
   return (

@@ -10,6 +10,10 @@ type BoardsDetailAction =
       type: "ADD_TASK" | "DELETE_TASK" | "UPDATE_TASK"
       data: Task
     }
+  | {
+      type: "UPDATE_TASK_STATUS"
+      data: { id: string; newColumn: "ToDo" | "Progress" | "Done" }
+    }
 
 export function useBoardDetailReducer(
   prevState: Board,
@@ -49,6 +53,18 @@ export function useBoardDetailReducer(
           task.id === action.data.id ? action.data : task
         ),
       }
+      break
+    }
+    case "UPDATE_TASK_STATUS": {
+      newState = {
+        ...prevState,
+        tasks: prevState.tasks.map((task) =>
+          task.id === action.data.id
+            ? { ...task, column: action.data.newColumn }
+            : task
+        ),
+      }
+      newState.tasks = [...newState.tasks]
       break
     }
   }
