@@ -11,23 +11,28 @@ import {
   DialogDescription,
 } from "../../components/ui/dialog"
 import BoardCard from "./components/BoardCard"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useReducer } from "react"
 import { userBoardsOverviewReducer } from "../../hooks/boardsOverwievReducer"
 import type { Board } from "../../types/bord.types"
 import { getBoards } from "../../lib/api"
 
 export default function BoardOverview() {
-  const [boards, boardsDispatch] = useReducer(
-    userBoardsOverviewReducer,
-    getBoards()
-  )
+  const [boards, boardsDispatch] = useReducer(userBoardsOverviewReducer, [])
 
   const [boardNameInput, setBoardNameInput] = useState("Neues Board")
 
   const resetBoardNameInput = () => {
     setBoardNameInput("Neues Board")
   }
+  async function fetchBoards() {
+    const boards = await getBoards()
+    boardsDispatch({ type: "SET", data: boards })
+  }
+
+  useEffect(() => {
+    fetchBoards()
+  }, [])
 
   function handleAddNewBoard() {
     const newBoard: Board = {
