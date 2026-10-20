@@ -1,11 +1,11 @@
 import { Button } from "../../components/ui/button"
-import { useReducer, useState } from "react"
+import { useReducer, useState, useEffect } from "react"
 import { useBoardDetailReducer } from "@/hooks/boardsDetailReducer"
 import BoardColumn from "./components/BoardColumn"
 import { ArrowLeft, Pencil, Check, X } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import { Input } from "../../components/ui/input"
-import { getBoardById } from "@/lib/api"
+import { getBoardById, updateBoard } from "@/lib/api"
 import type { Task } from "@/types/bord.types"
 import TaskDialog from "./components/TaskDialog"
 
@@ -13,20 +13,24 @@ export default function BoardDetail() {
   const { id } = useParams<{ id: string }>()
   const [isEditName, setIsEditName] = useState(false)
   const [boardName, setBoardName] = useState("Name des Boards")
+  //const [board, setBoard] = useState<Board | undefined>()
+  const [board, dispatchBoard] = useReducer(useBoardDetailReducer, undefined)
 
-  const boardFromStorage = getBoardById(id ?? "") ?? {
-    id: "",
-    title: "",
-    tasks: [],
+  async function fetchBoard() {
+    const board = await getBoardById(id ?? "")
+    dispatchBoard({ type: "SET_BOARD", data: board })
   }
+
+  useEffect(() => {
+    fetchBoard()
+  }, [])
 
   const [isEditTaskDialogOpen, setIsEditTaskDialogOpen] = useState(false)
   const [editTask, setEditTask] = useState<Task | undefined>()
 
-  const [board, dispatchBoard] = useReducer(
-    useBoardDetailReducer,
-    boardFromStorage
-  )
+  if (!board) {
+    return <div>Loading...</div>
+  }
 
   function handleAddTask(task: Task) {
     dispatchBoard({ type: "ADD_TASK", data: task })
@@ -54,6 +58,13 @@ export default function BoardDetail() {
   }
 
   function handleSubmitBoardTitle() {
+    if (!board) return
+
+    const updatedBoard = updateBoard(board.id, { title: boardName })
+    if (!updatedBoard) {
+      console.error("Failed to update board")
+      return
+    }
     dispatchBoard({ type: "UPDATE_BOARD_NAME", data: boardName })
     setIsEditName(false)
   }

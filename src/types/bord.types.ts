@@ -6,6 +6,8 @@ export interface BoardLocalstorage {
   tasks: Task[]
 }
 
+export type UpdateBoard = Partial<Omit<Board, "tasks">>
+
 export type Board = Database["public"]["Tables"]["boards"]["Row"] & {
   tasks: Database["public"]["Tables"]["tasks"]["Row"][]
 }

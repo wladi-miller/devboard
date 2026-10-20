@@ -1,5 +1,6 @@
 import { Button } from "../../components/ui/button"
 import { DialogClose, DialogFooter } from "../../components/ui/dialog"
+import { insertBoard, deleteBoard } from "../../lib/api"
 import { Input } from "../../components/ui/input"
 import { Plus } from "lucide-react"
 import {
@@ -34,22 +35,30 @@ export default function BoardOverview() {
     fetchBoards()
   }, [])
 
-  function handleAddNewBoard() {
+  async function handleAddNewBoard() {
     const newBoard: Board = {
-      id: String(Math.random()),
+      id: "",
       title: boardNameInput.trim() || "Neues Board",
+      created_at: new Date().toISOString(),
       tasks: [],
     }
-
-    boardsDispatch({ type: "ADD", data: newBoard })
-    resetBoardNameInput()
+    const insertedBoard = await insertBoard(newBoard)
+    if (insertedBoard) {
+      boardsDispatch({ type: "ADD", data: insertedBoard })
+      resetBoardNameInput()
+    }
   }
 
   function handleDeleteBoard(id: string) {
-    boardsDispatch({
-      type: "DELETE",
-      data: { id: id, title: "", tasks: [] },
-    })
+    try {
+      deleteBoard(id)
+      boardsDispatch({
+        type: "DELETE",
+        data: { id: id, title: "", tasks: [], created_at: "" },
+      })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (

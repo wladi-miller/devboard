@@ -1,4 +1,4 @@
-import type { Board } from "@/types/bord.types"
+import type { Board, UpdateBoard } from "@/types/bord.types"
 import supabase from "@/lib/db"
 
 const local_Storage_Boards_Key = "boards"
@@ -27,8 +27,18 @@ export function getBoardsFromLocalstorage(): Board[] {
 export async function getBoardById(
   boardId: string
 ): Promise<Board | undefined> {
-  const boards = await getBoards()
-  return boards.find((board) => board.id === boardId)
+  const { data: board, error } = await supabase
+    .from("boards")
+    .select("*, tasks(*)")
+    .eq("id", boardId)
+    .single()
+
+  if (error) {
+    console.error(error)
+    return undefined
+  }
+
+  return board
 }
 
 export async function saveBoards(boards: Board[]): Promise<void> {
@@ -52,4 +62,48 @@ export async function deleteBoards(boardId: string): Promise<void> {
   const boards = await getBoards()
   const updatedBoards = boards.filter((board) => board.id !== boardId)
   await saveBoards(updatedBoards)
+}
+
+export async function deleteBoard(id: string): Promise<void> {
+  const { error } = await supabase.from("boards").delete().eq("id", id)
+  if (error) {
+    console.error(error)
+    throw new Error("Failed to delete board")
+  }
+}
+
+export async function insertBoard(board: Board): Promise<Board | null> {
+  const { data, error } = await supabase
+    .from("boards")
+    .insert([{ title: board.title, created_at: board.created_at }])
+    .select("*, tasks(*)")
+    .single()
+
+  if (error) {
+    console.error(error)
+    throw new Error("Failed to insert board")
+    return null
+  }
+
+  return data
+}
+
+export async function updateBoard(
+  id: string,
+  board: UpdateBoard
+): Promise<Board | null> {
+  const { data, error } = await supabase
+    .from("boards")
+    .update(board)
+    .eq("id", id)
+    .select("*, tasks(*)")
+    .single()
+
+  if (error) {
+    console.error(error)
+    throw new Error("Failed to update board")
+    return null
+  }
+
+  return data
 }
