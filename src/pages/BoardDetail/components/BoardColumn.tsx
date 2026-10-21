@@ -1,7 +1,7 @@
 import { Button } from "../../../components/ui/button"
 import { Plus } from "lucide-react"
 import TaskCard from "./TaskCard"
-import type { Task } from "../../../types/bord.types"
+import type { Task, CreateTask } from "../../../types/bord.types"
 import { useState } from "react"
 import React from "react"
 
@@ -17,7 +17,7 @@ export default function BoardColumn({
 }: {
   title: "ToDo" | "Progress" | "Done"
   tasks: Task[]
-  onAddTask: (task: Task) => void
+  onAddTask: (task: CreateTask) => void
   onDeleteTask: (task: Task) => void
   handleEditTask: (task: Task) => void
   onUpdateTaskStatus: (
@@ -81,10 +81,6 @@ export default function BoardColumn({
 
   const showDropHint = isDragHover && tasks.length === 0
 
-  function getRandomId(): string {
-    return String(Math.random())
-  }
-
   return (
     <div
       className={
@@ -116,16 +112,16 @@ export default function BoardColumn({
         <TaskDialog
           open={isTaskDialogOpen}
           handleOpenChange={setIsTaskDialogOpen}
-          onSubmitUpdate={onAddTask}
+          onSubmitCreate={onAddTask}
           title="Neues Task erstellen"
           description="Erstelle eine neue Aufgabe für diese Spalte."
           task={{
-            id: getRandomId(),
             title: "",
             description: "",
             column: title,
-            deadline: undefined,
-            assignee: undefined,
+            deadline: null,
+            assignedTo: null,
+            boardID: "",
           }}
         />
       </div>

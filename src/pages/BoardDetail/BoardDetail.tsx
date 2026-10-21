@@ -1,6 +1,7 @@
 import { Button } from "../../components/ui/button"
 import { useReducer, useState, useEffect } from "react"
-import type { CreateTask } from "@/types/bord.types"
+import type { CreateTask, UpdateTask } from "@/types/bord.types"
+import { updateTask, deleteTask } from "@/lib/api"
 import { insertTask } from "@/lib/api"
 import { useBoardDetailReducer } from "@/hooks/boardsDetailReducer"
 import BoardColumn from "./components/BoardColumn"
@@ -33,30 +34,60 @@ export default function BoardDetail() {
     return <div>Loading...</div>
   }
 
-  async function handleAddTask(task: Task) {
-    const InsertedTask = await insertTask({ ...task, boardID: board?.id ?? "" })
-    dispatchBoard({ type: "ADD_TASK", data: InsertedTask ?? task })
+  async function handleAddTask(task: CreateTask) {
+    const insertedTask = await insertTask({ ...task, boardID: board?.id ?? "" })
+    if (!insertedTask) {
+      console.error("Failed to create task")
+      return
+    }
+
+    dispatchBoard({ type: "ADD_TASK", data: insertedTask })
   }
 
-  function handleDeleteTask(task: Task) {
+  async function handleDeleteTask(task: Task) {
+    const wasDeleted = await deleteTask(task.id)
+    if (!wasDeleted) {
+      console.error("Failed to delete task")
+      return
+    }
+
     dispatchBoard({ type: "DELETE_TASK", data: task })
   }
 
-  function handleUpdateTaskStatus(
+  async function handleUpdateTaskStatus(
     id: string,
     newColumn: "ToDo" | "Progress" | "Done"
   ) {
+    const updatedTask = await updateTask(id, { column: newColumn })
+    if (!updatedTask) {
+      console.error("Failed to update task column")
+      return
+    }
+
     dispatchBoard({ type: "UPDATE_TASK_STATUS", data: { id, newColumn } })
   }
 
-  function handleSubmitTaskUpdate(task: Task) {
-    dispatchBoard({ type: "UPDATE_TASK", data: task })
+  async function handleSubmitTaskUpdate(task: UpdateTask) {
+    if (!task?.id) {
+      console.error("Task ID is missing")
+      return
+    }
+
+    const updatedTask = await updateTask(task.id, {
+      ...task,
+      boardID: board?.id ?? "",
+    })
+    if (!updatedTask) {
+      console.error("Failed to update task")
+      return
+    }
+    dispatchBoard({ type: "UPDATE_TASK", data: updatedTask })
     setIsEditTaskDialogOpen(false)
   }
 
   function handleEditBoardTitle() {
     setIsEditName(true)
-    setBoardName(board.title)
+    setBoardName(board?.title ?? "")
   }
 
   function handleSubmitBoardTitle() {
@@ -105,7 +136,7 @@ export default function BoardDetail() {
 
     return (
       <div className="flex flex-row items-center gap-2">
-        <h1 className="text-2xl font-bold">{board.title}</h1>
+        <h1 className="text-2xl font-bold">{board?.title ?? ""}</h1>
         <Button variant="ghost" size="icon-lg" onClick={handleEditBoardTitle}>
           <Pencil className="size-4" />
         </Button>
@@ -136,9 +167,11 @@ export default function BoardDetail() {
             id: "",
             title: "",
             description: "",
-            deadline: undefined,
-
+            deadline: null,
             column: "ToDo",
+            assignedTo: null,
+            boardID: board.id ?? "",
+            created_at: new Date().toString(),
           }
         }
       />

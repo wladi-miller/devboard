@@ -34,10 +34,10 @@ export default function TaskCard({
         <CardTitle>{task.title}</CardTitle>
         <CardDescription className="flex flex-col">
           {task.description && <span className="mb-2">{task.description}</span>}
-          {task.assignee && (
+          {task.assignedTo && (
             <span className="flex items-center gap-1">
               {<CircleUser className="size-3" />}
-              {task.assignee}
+              {task.assignedTo}
             </span>
           )}
           {task.deadline && (

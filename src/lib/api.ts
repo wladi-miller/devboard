@@ -1,6 +1,6 @@
 import type { Board, UpdateBoard } from "@/types/bord.types"
 import supabase from "@/lib/db"
-import type { Task, CreateTask } from "@/types/bord.types"
+import type { Task, CreateTask, UpdateTask } from "@/types/bord.types"
 
 const local_Storage_Boards_Key = "boards"
 
@@ -126,4 +126,38 @@ export async function insertTask(task: CreateTask): Promise<Task | null> {
   }
 
   return data as Task
+}
+
+export async function updateTask(
+  id: string,
+  task: UpdateTask
+): Promise<Task | null> {
+  const { data, error } = await supabase
+    .from("tasks")
+    .update(task)
+    .eq("id", id)
+    .select("*")
+    .single()
+
+  if (error) {
+    console.error(error)
+    return null
+  }
+
+  if (!data) {
+    return null
+  }
+
+  return data as Task
+}
+
+export async function deleteTask(id: string): Promise<boolean> {
+  const { error } = await supabase.from("tasks").delete().eq("id", id)
+
+  if (error) {
+    console.error(error)
+    return false
+  }
+
+  return true
 }
