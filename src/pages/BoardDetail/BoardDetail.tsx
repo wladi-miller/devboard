@@ -1,5 +1,7 @@
 import { Button } from "../../components/ui/button"
 import { useReducer, useState, useEffect } from "react"
+import type { CreateTask } from "@/types/bord.types"
+import { insertTask } from "@/lib/api"
 import { useBoardDetailReducer } from "@/hooks/boardsDetailReducer"
 import BoardColumn from "./components/BoardColumn"
 import { ArrowLeft, Pencil, Check, X } from "lucide-react"
@@ -13,7 +15,6 @@ export default function BoardDetail() {
   const { id } = useParams<{ id: string }>()
   const [isEditName, setIsEditName] = useState(false)
   const [boardName, setBoardName] = useState("Name des Boards")
-  //const [board, setBoard] = useState<Board | undefined>()
   const [board, dispatchBoard] = useReducer(useBoardDetailReducer, undefined)
 
   async function fetchBoard() {
@@ -32,8 +33,9 @@ export default function BoardDetail() {
     return <div>Loading...</div>
   }
 
-  function handleAddTask(task: Task) {
-    dispatchBoard({ type: "ADD_TASK", data: task })
+  async function handleAddTask(task: Task) {
+    const InsertedTask = await insertTask({ ...task, boardID: board?.id ?? "" })
+    dispatchBoard({ type: "ADD_TASK", data: InsertedTask ?? task })
   }
 
   function handleDeleteTask(task: Task) {

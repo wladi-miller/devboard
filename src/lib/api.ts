@@ -1,5 +1,6 @@
 import type { Board, UpdateBoard } from "@/types/bord.types"
 import supabase from "@/lib/db"
+import type { Task, CreateTask } from "@/types/bord.types"
 
 const local_Storage_Boards_Key = "boards"
 
@@ -106,4 +107,23 @@ export async function updateBoard(
   }
 
   return data
+}
+
+export async function insertTask(task: CreateTask): Promise<Task | null> {
+  const { data, error } = await supabase
+    .from("tasks")
+    .insert(task)
+    .select("*")
+    .single()
+
+  if (error) {
+    console.error(error)
+    return null
+  }
+
+  if (!data) {
+    return null
+  }
+
+  return data as Task
 }

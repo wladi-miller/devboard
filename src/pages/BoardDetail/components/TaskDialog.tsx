@@ -26,7 +26,7 @@ import {
 import { Button } from "../../../components/ui/button"
 import { Input } from "../../../components/ui/input"
 import { Textarea } from "../../../components/ui/textarea"
-import type { Task } from "@/types/bord.types"
+import type { CreateTask, Task } from "@/types/bord.types"
 import UserNameContext from "@/context/UserNameContext"
 
 function parseDeadline(deadline?: string): Date | undefined {
@@ -45,7 +45,7 @@ export default function TaskDialog({
 }: {
   open: boolean
   handleOpenChange: (open: boolean) => void
-  onSubmitUpdate: (task: Task) => void
+  onSubmitUpdate: (task: CreateTask) => void
   title: string
   description: string
   task: Task
@@ -84,14 +84,13 @@ export default function TaskDialog({
   }
 
   function handleSubmitUpdate() {
-    const updatedTask: Task = {
-      ...task,
-      id: task.id || `task-${Date.now()}-${Math.random()}`,
+    const updatedTask: CreateTask = {
       title: taskTitle,
       description: taskDiscription,
-      deadline: date?.toISOString(),
-      assignee: selectedPerson || undefined,
+      deadline: date?.toISOString() ?? "",
+      assignedTo: selectedPerson,
       column: task.column,
+      boardID: "",
     }
 
     onSubmitUpdate(updatedTask)
